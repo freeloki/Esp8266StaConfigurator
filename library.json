@@ -1,0 +1,23 @@
+{
+    "name": "Esp8266EasyConfigurator",
+    "description": "Start a webserver in access point and set wifi credentials. Restart ESP with station mode.",
+    "keywords": "esp8266, webserver, wifi, station, mode, access point,ap",
+    "authors": [
+        {
+            "name": "Yavuz Erzurumlu",
+            "email": "yavuzerzurumlu@gmail.com",
+            "url": "http://www.codegeni.us",
+            "maintainer": true
+        }
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/freeloki/Esp8266StaConfigurator"
+    },
+    "version": "1.0.0",
+    "homepage": "http://www.codegeni.us/Esp8266StaConfigurator",
+    "frameworks": "ESP8266",
+    "examples": [
+        "examples/*/*.pde"
+    ]
+}

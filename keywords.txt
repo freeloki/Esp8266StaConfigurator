@@ -1,0 +1,11 @@
+Esp8266EasyConfigurator KEYWORD1
+startServer KEYWORD2
+stopServer KEYWORD2
+isServerStarted KEYWORD2
+handleConfigurations    KEYWORD2
+handleNotFound  KEYWORD2
+saveConfigAndRestart    KEYWORD2
+refreshIndex   KEYWORD2
+writeInfoToSerial   KEYWORD2
+
+
