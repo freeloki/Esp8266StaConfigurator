@@ -3,6 +3,13 @@
 
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
+#if defined(ARDUINO) && ARDUINO >= 100
+#include "Arduino.h"
+#else
+#include "WProgram.h"
+#endif
+
+#include <ArduinoJson.h>
 
 #define SERVER_PORT 80
 
@@ -17,6 +24,7 @@ class Esp8266EasyConfigurator {
     bool startServer();
     bool stopServer();
     bool isServerStarted();
+    void loop();
 
 
   private:
@@ -31,6 +39,8 @@ class Esp8266EasyConfigurator {
     String setupPage;
     bool isStarted;
     int tryCount;
+    String ssid;
+    String password;
 };
 
 #endif
