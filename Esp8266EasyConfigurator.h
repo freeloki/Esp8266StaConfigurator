@@ -25,6 +25,9 @@ class Esp8266EasyConfigurator {
     bool stopServer();
     bool isServerStarted();
     void loop();
+    void printPrettyInfo();
+    void setWiFiToAP(String accessPointName);
+    String getMode();
 
 
   private:
@@ -34,6 +37,8 @@ class Esp8266EasyConfigurator {
     void saveConfigAndRestart();
     void refreshIndex();
     void writeInfoToSerial(String msg);
+    void tryToConnectWifi(int tryCount);
+    
 
     ESP8266WebServer *server;
     String setupPage;
@@ -41,6 +46,7 @@ class Esp8266EasyConfigurator {
     int tryCount;
     String ssid;
     String password;
+    String accessPointName;
 };
 
 #endif

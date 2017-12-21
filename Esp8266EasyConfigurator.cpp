@@ -27,7 +27,9 @@ bool Esp8266EasyConfigurator::startServer() {
     server->on("/save-configuration-and-restart",HTTP_POST,std::bind(&Esp8266EasyConfigurator::saveConfigAndRestart,this));
     server->onNotFound(std::bind(&Esp8266EasyConfigurator::handleNotFound,this));
     server->begin();
-    Serial.println("HTTP Server started(AP Mode)");
+    
+    String serverInfo = "HTTP Server started in [ " + getMode() + " ] mode ";
+    Serial.println(serverInfo);
     isStarted = true;
   }
   return isStarted;
@@ -163,7 +165,7 @@ void Esp8266EasyConfigurator::refreshIndex() {
       "</style>\n"
       "<body>\n"
       "<h2 class=\"center\">ESP8266 Wifi Configuration</h2>\n"
-      "<form action=\"saveConfigAndRestart\" method=\"post\" onsubmit=\"return confirmDialog();\">\n"
+      "<form action=\"save-configuration-and-restart\" method=\"post\" onsubmit=\"return confirmDialog();\">\n"
       "<div class=\"container\">\n"
       "  <label for=\"ssid\"><b>SSID:</b></label>\n"
       "  <input type=\"text\" placeholder=\"SSID\" name=\"ssid\" id=\"ssid\" value=\"";
@@ -194,15 +196,129 @@ void Esp8266EasyConfigurator::saveConfigAndRestart(){
       Serial.println(ssid);
       Serial.println("Passwd:");
       Serial.println(password);
+      
+      writeInfoToSerial("Wifi mode:");
+      Serial.println(WiFi.getMode());
+      if(WiFi.getMode() != WIFI_STA){
       WiFi.mode(WIFI_STA);
+      }
       WiFi.begin(ssid.c_str(),password.c_str());
+      this->tryToConnectWifi(10);
      
-      //ESP.restart();
+      
   } else {
 	  server->send (500, "text/plain", "Configuration failure. Check your parameters and try again." );
   }
 }
 
+void Esp8266EasyConfigurator::tryToConnectWifi(int tryCount){
+	
+	int tried = 0;
+	 
+	 if(tried < tryCount){
+		while (WiFi.status() != WL_CONNECTED ) {
+	
+			  delay(500);
+			  Serial.print(".");
+              tried++;
+	   }
+     }else {
+	    Serial.println("Max Tryout Reached. Restarting on AP Mode");
+	    WiFi.mode(WIFI_AP);
+	    delay(500);
+	    Serial.println("Setting AP MODE.");
+	      while(WiFi.getMode() != WIFI_AP){
+	           Serial.print(".");
+	           delay(200);
+	     }
 
+
+    Serial.println("Restarting...");
+	ESP.restart();
+	
+    }
+  
+ }
+ 
+ void Esp8266EasyConfigurator::printPrettyInfo(){
+		   
+		  if (Serial) {
+
+			int mode = WiFi.getMode();
+			if(mode == WIFI_OFF){
+			   Serial.println("WIFI_OFF");
+			}else if(mode == WIFI_STA){
+			   Serial.println("WIFI_STA");
+			}else if(mode == WIFI_AP){
+			   Serial.println("WIFI_AP");
+			}else if(mode == WIFI_AP_STA){
+			   Serial.println("WIFI_AP_STA");
+			}
+			
+			Serial.println("WiFi SSID:");
+			Serial.println(WiFi.SSID());
+       
+			Serial.println("WiFi MAC:");
+			byte mac[6];
+			WiFi.macAddress(mac);
+			Serial.print(mac[5],HEX);
+			Serial.print(":");
+			Serial.print(mac[4],HEX);
+			Serial.print(":");
+		    Serial.print(mac[3],HEX);
+			Serial.print(":");
+			Serial.print(mac[2],HEX);
+			Serial.print(":");
+			Serial.print(mac[1],HEX);
+			Serial.print(":");
+			Serial.println(mac[0],HEX);
+ 
+        
+        if(WiFi.getMode() == WIFI_STA){
+			Serial.println("Local IP:");
+			Serial.println(WiFi.localIP());
+		}else if(WiFi.getMode() == WIFI_AP){
+			Serial.println(WiFi.softAPIP());
+		}
+		
+	}
+	 
+	 
+	 WiFi.printDiag(Serial);
+ }
+
+void Esp8266EasyConfigurator::setWiFiToAP(String accessPointName){
+	
+	//if(WiFi.getMode != WIFI_AP){
+	WiFi.mode(WIFI_AP);
+	WiFi.softAP(accessPointName.c_str());
+	
+	Serial.println("Setting Access Point...");
+	while(WiFi.getMode() != WIFI_AP){
+		Serial.print(".");
+		delay(200);
+	}
+	
+	Serial.println("Done!");
+   //}
+}
+
+String Esp8266EasyConfigurator::getMode(){
+				Serial.println("WiFi Mode:");
+			int mode = WiFi.getMode();
+			if(mode == WIFI_OFF){
+			   Serial.println("WIFI_OFF");
+			   return "WIFI_OFF";
+			}else if(mode == WIFI_STA){
+			   Serial.println("WIFI_STA");
+			   return "WIFI_STA";
+			}else if(mode == WIFI_AP){
+			   Serial.println("WIFI_AP");
+			   return "WIFI_AP";
+			}else if(mode == WIFI_AP_STA){
+			   Serial.println("WIFI_AP_STA");
+			   return "WIFI_AP_STA";
+		   }
+}
 
 
